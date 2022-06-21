@@ -1,5 +1,7 @@
 #!/usr/bin/python3.8
 
+#test
+
 # This script is used to determine when a NW swell will hit Pua'ena Point
 
 import os

@@ -13,18 +13,14 @@ if os.path.exists('51101.spec'):
     os.remove('51101.spec')
 
 # This regex will split the data file into usable pieces, see "Regex Group Key" below
-wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d+\.\d)\s+(\d+\.\d)\s+(\d+\.\d)\s+\d+\.\d\s+\d+\.\d\s+(\S+)\s+(\S+)\s+\S+\s+\d+\.\d+\s+(\d+)')
+wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(.*)')
 """     Regex Group Key:
         group(1) = year
         group(2) = month
         group(3) = day
         group(4) = hour
         group(5) = minute
-        group(6) = WVHT (the average height (meters) of the highest one-third of waves)
-        group(7) = SwH (swell height, vertical distance (meters) between swell crest and successding trough)
-        group(8) = SwP (period, or time it takes successive swell wave crests to pass a fixed point)
-        group(9) = SwD (The direction (NWSE) from which the swell waves at the swell wave period (SWPD) are coming)
-        group(10) = MWD (The direction (in degrees) from which the waves at the dominant period (DPD) are coming) 
+        group(6) = rest of line
 """
 # This regex will split the local_time string, in order to 
 local_time_regex = re.compile(r'(\d+)-(\d+)-(\d+)\s(\d+):(\d+)')
@@ -50,7 +46,7 @@ def convert_datetime_to_hst(datetime_string):
     time_in_hawaii_string = str(time_in_hawaii)
     # strip -10:00 from the end of the string
     size = len(time_in_hawaii_string)
-    time_in_hawaii_string = time_in_hawaii_string[:size - 6]
+    time_in_hawaii_string = time_in_hawaii_string[:size - 9]
     return time_in_hawaii_string
 
 #2022-06-18 20:40:00
@@ -66,7 +62,7 @@ for i in range(26):
         mo = wave_data_regex.search(line)
         utc_time_string = ('%s-%s-%s %s:%s:00' % (mo.group(1), mo.group(2), mo.group(3), mo.group(4), mo.group(5)))
         local_time = convert_datetime_to_hst(utc_time_string)
-        print(local_time)
+        print(local_time + '  ' + mo.group(6))
         
 #os.remove('51101.spec')
 """

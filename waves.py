@@ -1,6 +1,6 @@
 #!/usr/bin/python3.8
 
-# This script is used to determine when a NW swell will hit Pua'ena Point
+# This script is used to determine when a NW swell will hit the North Shore of O'ahu
 
 import os
 import re

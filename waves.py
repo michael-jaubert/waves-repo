@@ -60,8 +60,6 @@ def convert_to_hst_and_add_travel_time(datetime_string, period_string):
     time_in_hawaii_string = time_in_hawaii_string[:size - 16]
     return time_in_hawaii_string
 
-#2022-06-18 20:40:00
-
 for i in range(26):
     line = raw_data.readline().strip('\n')
     if '#' in line:

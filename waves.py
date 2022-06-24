@@ -44,7 +44,7 @@ def convert_meters_to_feet(height_in_meters):
     return str(height_in_feet)
 
 def build_table():
-    # Get raw_data from downloaded file, print table with updated values, delete file
+    # Get raw_data from downloaded file, print 2 header lines, then print last 24 hours of data with updated values, then delete file
     raw_data = get_input_file()
     for i in range(26):
         line = raw_data.readline().strip('\n')

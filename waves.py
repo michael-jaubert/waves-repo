@@ -66,18 +66,18 @@ def build_table():
             print(local_time + WVHT + SwH + period + rest_of_string)
     os.remove('51101.spec')
 
-# This regex will split the data file into usable pieces, see "Regex Group Key" below
 wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d+\.\d)\s+(\d+\.\d)\s+(\d+\.\d)(.+)')
-"""     Regex Group Key:
-        group(1) = year
-        group(2) = month
-        group(3) = day
-        group(4) = hour
-        group(5) = minute
-        group(6) = WVHT (the average height (meters) of the highest one-third of waves)
-        group(7) = SwH (swell height, vertical distance (meters) between swell crest and successding trough)
-        group(8) = SwP (period, or time it takes successive swell wave crests to pass a fixed point)
-        group(9) = Rest of string
-"""
+
+# The above regex will split the data file into usable pieces, see key below:
+# Regex Group Key:
+# group(1) = year
+# group(2) = month
+# group(3) = day
+# group(4) = hour
+# group(5) = minute
+# group(6) = WVHT (the average height (meters) of the highest one-third of waves)
+# group(7) = SwH (swell height, vertical distance (meters) between swell crest and successding trough)
+# group(8) = SwP (period, or time it takes successive swell wave crests to pass a fixed point)
+# group(9) = Rest of string
 
 build_table()

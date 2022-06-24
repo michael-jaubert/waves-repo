@@ -8,37 +8,16 @@ import wget
 import datetime
 import pytz
 
-# Check if an old data file already exists, delete it, then download new data file and open it
-
-if os.path.exists('51101.spec'):
-    os.remove('51101.spec')
-
-site_url = 'https://www.ndbc.noaa.gov/data/realtime2/51101.spec'
-
-print('Downloading wave data from NOAA')
-wget.download(site_url, out='51101.spec')
-print('\nDownload complete')
-print('Processing Wave Data')
-
-raw_data = open('51101_static.spec', 'r')
-
-# This regex will split the data file into usable pieces, see "Regex Group Key" below
-wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d+\.\d)\s+(\d+\.\d)\s+(\d+\.\d)(.+)')
-"""     Regex Group Key:
-        group(1) = year
-        group(2) = month
-        group(3) = day
-        group(4) = hour
-        group(5) = minute
-        group(6) = WVHT (the average height (meters) of the highest one-third of waves)
-        group(7) = SwH (swell height, vertical distance (meters) between swell crest and successding trough)
-        group(8) = SwP (period, or time it takes successive swell wave crests to pass a fixed point)
-        group(9) = Rest of string
-"""
-
-# This regex will split the local_time string, in order to 
-local_time_regex = re.compile(r'(\d+)-(\d+)-(\d+)\s(\d+):(\d+)')
-
+def get_input_file():
+    # Check if an old data file already exists, delete it, then download new data file and open it
+    if os.path.exists('51101.spec'):
+        os.remove('51101.spec')
+    site_url = 'https://www.ndbc.noaa.gov/data/realtime2/51101.spec'
+    print('Downloading wave data from NOAA')
+    wget.download(site_url, out='51101.spec')
+    print('\nDownload complete')
+    print('Processing Wave Data')
+    return open('51101.spec', 'r')
 
 def convert_to_hst_and_add_travel_time(datetime_string, period_string):
     # convert from string to datetime type, localize it, and convert from UTC to Pacific/Honolulu
@@ -64,6 +43,25 @@ def convert_meters_to_feet(height_in_meters):
     height_in_feet = round(height_in_feet, 1)
     return str(height_in_feet)
 
+# This regex will split the data file into usable pieces, see "Regex Group Key" below
+wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d+\.\d)\s+(\d+\.\d)\s+(\d+\.\d)(.+)')
+"""     Regex Group Key:
+        group(1) = year
+        group(2) = month
+        group(3) = day
+        group(4) = hour
+        group(5) = minute
+        group(6) = WVHT (the average height (meters) of the highest one-third of waves)
+        group(7) = SwH (swell height, vertical distance (meters) between swell crest and successding trough)
+        group(8) = SwP (period, or time it takes successive swell wave crests to pass a fixed point)
+        group(9) = Rest of string
+"""
+
+# This regex will split the local_time string, in order to
+local_time_regex = re.compile(r'(\d+)-(\d+)-(\d+)\s(\d+):(\d+)')
+
+raw_data = get_input_file()
+
 for i in range(26):
     line = raw_data.readline().strip('\n')
     if '#' in line:
@@ -71,7 +69,6 @@ for i in range(26):
         print(line)
     else:
         # print out the rest of the wave data in HST timezone and in feet (right adjusted)
-        print(line)
         mo = wave_data_regex.search(line)
         utc_time_string = ('%s %s %s %s %s 00' % (mo.group(1), mo.group(2), mo.group(3), mo.group(4), mo.group(5)))
         period = mo.group(8)
@@ -82,5 +79,5 @@ for i in range(26):
         period = period.rjust(5)
         rest_of_string = mo.group(9)
         print(local_time + WVHT + SwH + period + rest_of_string)
-        
+
 os.remove('51101.spec')

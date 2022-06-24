@@ -20,19 +20,19 @@ def get_input_file():
     return open('51101.spec', 'r')
 
 def convert_to_hst_and_add_travel_time(datetime_string, period_string):
-    # convert from string to datetime type, localize it, and convert from UTC to Pacific/Honolulu
+    # Convert from string to datetime type, localize it, and convert from UTC to Pacific/Honolulu
     timezone_HST = pytz.timezone('Pacific/Honolulu')
     utc_datetime = datetime.datetime.strptime(datetime_string,'%Y %m %d %H %M %S')
     utc_datetime = pytz.utc.localize(utc_datetime)
     time_in_hawaii = utc_datetime.astimezone(timezone_HST)
-    # add wave travel time
-    distance = 510.0 # distance in KM between buoy 51101 and North Shore of O'ahu
+    # Add wave travel time
+    distance = 510.0 # Distance (in KM) between buoy 51101 and North Shore of O'ahu
     period = float(period_string)
     velocity = ((1.56*period)*3600)/1000 # This will give you the speed of the wave in KM / hr
     hour_decimal = distance / velocity
     travel_time = datetime.timedelta(hours=hour_decimal)
     time_in_hawaii = time_in_hawaii + travel_time
-    # convert datetime object back to string, strip seconds and microseconds, then return result
+    # Convert datetime object back to string, strip seconds and microseconds, then return result
     time_in_hawaii_string = str(time_in_hawaii)
     size = len(time_in_hawaii_string)
     time_in_hawaii_string = time_in_hawaii_string[:size - 16]
@@ -53,7 +53,7 @@ def build_table():
         elif i == 1:
             print('#yr  mo dy hr mn    f    f  sec    m  sec  -  degT     -      sec degT')
         else:
-            # print out the rest of the wave data in HST timezone and in feet (right adjusted)
+            # Print out wave data in HST timezone and in feet (right adjusted)
             mo = wave_data_regex.search(line)
             utc_time_string = ('%s %s %s %s %s 00' % (mo.group(1), mo.group(2), mo.group(3), mo.group(4), mo.group(5)))
             period = mo.group(8)

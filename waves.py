@@ -26,7 +26,7 @@ def convert_to_hst_and_add_travel_time(datetime_string, period_string):
     utc_datetime = pytz.utc.localize(utc_datetime)
     time_in_hawaii = utc_datetime.astimezone(timezone_HST)
     # add wave travel time
-    distance = 510.0
+    distance = 510.0 # distance in KM between buoy 51101 and North Shore of O'ahu
     period = float(period_string)
     velocity = ((1.56*period)*3600)/1000 # This will give you the speed of the wave in KM / hr
     hour_decimal = distance / velocity

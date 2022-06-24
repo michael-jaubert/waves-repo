@@ -61,7 +61,7 @@ def convert_to_hst_and_add_travel_time(datetime_string, period_string):
     return time_in_hawaii_string
 
 def convert_meters_to_feet(height_in_meters):
-    height_in_feet = height_in_meters / 3.28084
+    height_in_feet = height_in_meters * 3.28084
 
 for i in range(26):
     line = raw_data.readline().strip('\n')

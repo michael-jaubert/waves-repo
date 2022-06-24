@@ -1,6 +1,6 @@
 #!/usr/bin/python3.8
 
-# This script is used to determine when a NW swell will hit the North Shore of O'ahu
+# Use to determine when a NW swell will hit the North Shore of O'ahu
 
 import os
 import re
@@ -8,9 +8,19 @@ import wget
 import datetime
 import pytz
 
-# First, check to see if an old data file already exists in the working directory
+# Check if an old data file already exists, delete it, then download new data file and open it
+
 if os.path.exists('51101.spec'):
     os.remove('51101.spec')
+
+site_url = 'https://www.ndbc.noaa.gov/data/realtime2/51101.spec'
+
+print('Downloading wave data from NOAA')
+wget.download(site_url, out='51101.spec')
+print('\nDownload complete')
+print('Processing Wave Data')
+
+raw_data = open('51101_static.spec', 'r')
 
 # This regex will split the data file into usable pieces, see "Regex Group Key" below
 wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d+\.\d)\s+(\d+\.\d)\s+(\d+\.\d)(.+)')
@@ -25,36 +35,26 @@ wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d
         group(8) = SwP (period, or time it takes successive swell wave crests to pass a fixed point)
         group(9) = Rest of string
 """
+
 # This regex will split the local_time string, in order to 
 local_time_regex = re.compile(r'(\d+)-(\d+)-(\d+)\s(\d+):(\d+)')
 
-site_url = 'https://www.ndbc.noaa.gov/data/realtime2/51101.spec'
-
-print('Downloading wave data from NOAA')
-wget.download(site_url, out='51101.spec')
-print('\nDownload complete')
-print('Processing Wave Data')
-
-raw_data = open('51101.spec', 'r')
 
 def convert_to_hst_and_add_travel_time(datetime_string, period_string):
+    # convert from string to datetime type, localize it, and convert from UTC to Pacific/Honolulu
     timezone_HST = pytz.timezone('Pacific/Honolulu')
-    # convert from string to datetime object
     utc_datetime = datetime.datetime.strptime(datetime_string,'%Y %m %d %H %M %S')
-    # localize datetime object to UTC
     utc_datetime = pytz.utc.localize(utc_datetime)
-    # convert datetime object from UTC to Pacific/Honolulu
     time_in_hawaii = utc_datetime.astimezone(timezone_HST)
-    # add travel time
+    # add wave travel time
     distance = 510.0
     period = float(period_string)
     velocity = ((1.56*period)*3600)/1000 # This will give you the speed of the wave in KM / hr
     hour_decimal = distance / velocity
     travel_time = datetime.timedelta(hours=hour_decimal)
     time_in_hawaii = time_in_hawaii + travel_time
-    # convert datetime object back to string
+    # convert datetime object back to string, strip seconds and microseconds, then return result
     time_in_hawaii_string = str(time_in_hawaii)
-    # strip -10:00 from the end of the string
     size = len(time_in_hawaii_string)
     time_in_hawaii_string = time_in_hawaii_string[:size - 16]
     return time_in_hawaii_string
@@ -67,19 +67,20 @@ def convert_meters_to_feet(height_in_meters):
 for i in range(26):
     line = raw_data.readline().strip('\n')
     if '#' in line:
-        # Print out the first 2 lines container the table headers
+        # print out the first 2 lines, which contain the table headers
         print(line)
     else:
-        # Print out the rest of the wave data with date/time of when it will hit Waimea Bay Buoy
+        # print out the rest of the wave data in HST timezone and in feet (right adjusted)
         print(line)
         mo = wave_data_regex.search(line)
         utc_time_string = ('%s %s %s %s %s 00' % (mo.group(1), mo.group(2), mo.group(3), mo.group(4), mo.group(5)))
         period = mo.group(8)
         local_time = convert_to_hst_and_add_travel_time(utc_time_string, period)
         local_time = local_time.replace('-', ' ')
-        WVHT = convert_meters_to_feet(float(mo.group(6)))
-        SwH = convert_meters_to_feet(float(mo.group(7)))
+        WVHT = convert_meters_to_feet(float(mo.group(6))).rjust(5)
+        SwH = convert_meters_to_feet(float(mo.group(7))).rjust(5)
+        period = period.rjust(5)
         rest_of_string = mo.group(9)
-        print(local_time + '  ' + WVHT + '  ' + SwH + ' ' + period + rest_of_string)
+        print(local_time + WVHT + SwH + period + rest_of_string)
         
 os.remove('51101.spec')

@@ -9,8 +9,8 @@ import datetime
 import pytz
 
 # First, check to see if an old data file already exists in the working directory
-#if os.path.exists('51101.spec'):
-#    os.remove('51101.spec'):
+if os.path.exists('51101.spec'):
+    os.remove('51101.spec')
 
 # This regex will split the data file into usable pieces, see "Regex Group Key" below
 wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d+\.\d)\s+(\d+\.\d)\s+(\d+\.\d)(.+)')
@@ -31,7 +31,7 @@ local_time_regex = re.compile(r'(\d+)-(\d+)-(\d+)\s(\d+):(\d+)')
 site_url = 'https://www.ndbc.noaa.gov/data/realtime2/51101.spec'
 
 print('Downloading wave data from NOAA')
-#wget.download(site_url, out='51101.spec')
+wget.download(site_url, out='51101.spec')
 print('\nDownload complete')
 print('Processing Wave Data')
 
@@ -82,4 +82,4 @@ for i in range(26):
         rest_of_string = mo.group(9)
         print(local_time + '  ' + WVHT + '  ' + SwH + ' ' + period + rest_of_string)
         
-#os.remove('51101.spec')
+os.remove('51101.spec')

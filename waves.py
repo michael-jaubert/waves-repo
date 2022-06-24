@@ -43,6 +43,28 @@ def convert_meters_to_feet(height_in_meters):
     height_in_feet = round(height_in_feet, 1)
     return str(height_in_feet)
 
+def build_table():
+    # Get raw_data from downloaded file, print table with updated values, delete file
+    raw_data = get_input_file()
+    for i in range(26):
+        line = raw_data.readline().strip('\n')
+        if '#' in line:
+            # print out the first 2 lines, which contain the table headers
+            print(line)
+        else:
+            # print out the rest of the wave data in HST timezone and in feet (right adjusted)
+            mo = wave_data_regex.search(line)
+            utc_time_string = ('%s %s %s %s %s 00' % (mo.group(1), mo.group(2), mo.group(3), mo.group(4), mo.group(5)))
+            period = mo.group(8)
+            local_time = convert_to_hst_and_add_travel_time(utc_time_string, period)
+            local_time = local_time.replace('-', ' ')
+            WVHT = convert_meters_to_feet(float(mo.group(6))).rjust(5)
+            SwH = convert_meters_to_feet(float(mo.group(7))).rjust(5)
+            period = period.rjust(5)
+            rest_of_string = mo.group(9)
+            print(local_time + WVHT + SwH + period + rest_of_string)
+    os.remove('51101.spec')
+
 # This regex will split the data file into usable pieces, see "Regex Group Key" below
 wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d+\.\d)\s+(\d+\.\d)\s+(\d+\.\d)(.+)')
 """     Regex Group Key:
@@ -60,24 +82,4 @@ wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d
 # This regex will split the local_time string, in order to
 local_time_regex = re.compile(r'(\d+)-(\d+)-(\d+)\s(\d+):(\d+)')
 
-raw_data = get_input_file()
-
-for i in range(26):
-    line = raw_data.readline().strip('\n')
-    if '#' in line:
-        # print out the first 2 lines, which contain the table headers
-        print(line)
-    else:
-        # print out the rest of the wave data in HST timezone and in feet (right adjusted)
-        mo = wave_data_regex.search(line)
-        utc_time_string = ('%s %s %s %s %s 00' % (mo.group(1), mo.group(2), mo.group(3), mo.group(4), mo.group(5)))
-        period = mo.group(8)
-        local_time = convert_to_hst_and_add_travel_time(utc_time_string, period)
-        local_time = local_time.replace('-', ' ')
-        WVHT = convert_meters_to_feet(float(mo.group(6))).rjust(5)
-        SwH = convert_meters_to_feet(float(mo.group(7))).rjust(5)
-        period = period.rjust(5)
-        rest_of_string = mo.group(9)
-        print(local_time + WVHT + SwH + period + rest_of_string)
-
-os.remove('51101.spec')
+build_table()

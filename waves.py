@@ -48,9 +48,10 @@ def build_table():
     raw_data = get_input_file()
     for i in range(26):
         line = raw_data.readline().strip('\n')
-        if '#' in line:
-            # print out the first 2 lines, which contain the table headers
+        if i == 0:
             print(line)
+        elif i == 1:
+            print('#yr  mo dy hr mn    f    f  sec    m  sec  -  degT     -      sec degT')
         else:
             # print out the rest of the wave data in HST timezone and in feet (right adjusted)
             mo = wave_data_regex.search(line)

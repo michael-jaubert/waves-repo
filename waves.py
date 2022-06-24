@@ -10,7 +10,7 @@ import pytz
 
 # First, check to see if an old data file already exists in the working directory
 #if os.path.exists('51101.spec'):
-#    os.remove('51101.spec')
+#    os.remove('51101.spec'):
 
 # This regex will split the data file into usable pieces, see "Regex Group Key" below
 wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d+\.\d)\s+(\d+\.\d)\s+(\d+\.\d)\s+\d+\.\d\s+\d+\.\d\s+(\S+)\s+(\S+)\s+\S+\s+\d+\.\d+\s+(\d+)')
@@ -59,6 +59,9 @@ def convert_to_hst_and_add_travel_time(datetime_string, period_string):
     size = len(time_in_hawaii_string)
     time_in_hawaii_string = time_in_hawaii_string[:size - 16]
     return time_in_hawaii_string
+
+def convert_meters_to_feet(height_in_meters):
+    height_in_feet = height_in_meters / 3.28084
 
 for i in range(26):
     line = raw_data.readline().strip('\n')

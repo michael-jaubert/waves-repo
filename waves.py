@@ -80,7 +80,4 @@ wave_data_regex = re.compile(r'(\d{4})\s(\d{2})\s(\d{2})\s(\d{2})\s(\d{2})\s+(\d
         group(9) = Rest of string
 """
 
-# This regex will split the local_time string, in order to
-local_time_regex = re.compile(r'(\d+)-(\d+)-(\d+)\s(\d+):(\d+)')
-
 build_table()

@@ -48,7 +48,9 @@ def build_table():
     raw_data = get_input_file()
     for i in range(26):
         line = raw_data.readline().strip('\n')
-        if i == 0:
+        if 'MM' in line:    # skip lines with missing data
+            continue
+        elif i == 0:
             print(line)
         elif i == 1:
             print('#yr  mo dy hr mn    f    f  sec    m  sec  -  degT     -      sec degT')

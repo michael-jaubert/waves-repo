@@ -1,6 +1,7 @@
 #!/usr/bin/python3.8
 
 # Use to determine when a NW swell will hit the North Shore of O'ahu
+# Downloads wave buoy data from NOAA (station 51101), converts from UTC to HST, converts from meters to feet, and adds travel time for the waves to reach O'ahu
 
 import os
 import re
